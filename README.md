@@ -1,3 +1,6 @@
+Will be kept up to date with latest fortios, please make issue or PR if you have problems/suggestions
+
+
 # fortigate_exporter
 
 ![Go](https://github.com/bluecmd/fortigate_exporter/workflows/Go/badge.svg)
