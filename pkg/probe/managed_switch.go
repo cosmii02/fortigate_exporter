@@ -202,7 +202,7 @@ func probeManagedSwitch(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Me
 	}
 
 	type Results struct {
-		Name           string              `json:"name"`
+		Name           string              `json:"switch-id"`
 		VDOM           string              `json:"vdom"`
 		Serial         string              `json:"serial"`
 		OSVersion      string              `json:"os_version"`
