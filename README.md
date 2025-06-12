@@ -1,4 +1,4 @@
-Will be kept up to date with latest fortios, please make issue or PR if you have problems/suggestions
+Will be kept up to date with latest fortios, please make issue or PR if you have problems/suggestions.
 
 
 # fortigate_exporter
