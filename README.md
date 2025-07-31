@@ -3,8 +3,8 @@ Will be kept up to date with latest fortios, please make issue or PR if you have
 
 # fortigate_exporter
 
-![Go](https://github.com/bluecmd/fortigate_exporter/workflows/Go/badge.svg)
-![Docker](https://github.com/bluecmd/fortigate_exporter/workflows/Docker/badge.svg)
+[![Go](https://github.com/cosmii02/fortigate_exporter/actions/workflows/go.yml/badge.svg)](https://github.com/cosmii02/fortigate_exporter/actions/workflows/go.yml)
+[![Docker](https://github.com/cosmii02/fortigate_exporter/actions/workflows/docker.yml/badge.svg)](https://github.com/cosmii02/fortigate_exporter/actions/workflows/docker.yml)
 [![Docker Repository on Quay](https://quay.io/repository/bluecmd/fortigate_exporter/status "Docker Repository on Quay")](https://quay.io/repository/bluecmd/fortigate_exporter)
 [![Matrix](https://img.shields.io/matrix/fortigate_exporter:matrix.org)](https://matrix.to/#/#fortigate_exporter:matrix.org)
 
