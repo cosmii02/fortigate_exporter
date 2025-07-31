@@ -45,6 +45,11 @@ func probeVPNIPSec(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric,
 			"Total number of configured IPsec connections (proxy IDs)",
 			[]string{"vdom"}, nil,
 		)
+		tunnelActiveConnections = prometheus.NewDesc(
+			"fortigate_ipsec_tunnel_connections_up",
+			"Number of active client connections for this IPsec tunnel",
+			[]string{"vdom", "tunnel", "type"}, nil,
+		)
 	)
 
 	type proxyid struct {
@@ -77,10 +82,21 @@ func probeVPNIPSec(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric,
 	vdomActiveConnections := make(map[string]int)
 	vdomTotalConnections := make(map[string]int)
 
+	// Maps to track per-tunnel connection counts
+	tunnelActiveConns := make(map[string]map[string]int) // vdom -> tunnel -> count
+
 	for _, v := range res {
+		// Initialize per-vdom tunnel connection map
+		if tunnelActiveConns[v.VDOM] == nil {
+			tunnelActiveConns[v.VDOM] = make(map[string]int)
+		}
+
 		for _, i := range v.Results {
 			// Count tunnels (now including dialup/client VPNs)
 			vdomTotalTunnels[v.VDOM]++
+
+			// Initialize connection count for this tunnel
+			tunnelActiveConns[v.VDOM][i.Name] = 0
 
 			// Check if tunnel has any active proxy IDs
 			hasActiveProxy := false
@@ -90,6 +106,7 @@ func probeVPNIPSec(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric,
 
 				if t.Status == "up" {
 					vdomActiveConnections[v.VDOM]++
+					tunnelActiveConns[v.VDOM][i.Name]++
 					hasActiveProxy = true
 				}
 
@@ -115,6 +132,25 @@ func probeVPNIPSec(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric,
 		m = append(m, prometheus.MustNewConstMetric(totalTunnels, prometheus.GaugeValue, float64(vdomTotalTunnels[vdom]), vdom))
 		m = append(m, prometheus.MustNewConstMetric(activeConnections, prometheus.GaugeValue, float64(vdomActiveConnections[vdom]), vdom))
 		m = append(m, prometheus.MustNewConstMetric(totalConnections, prometheus.GaugeValue, float64(vdomTotalConnections[vdom]), vdom))
+	}
+
+	// Add per-tunnel connection counts
+	for vdom, tunnels := range tunnelActiveConns {
+		for tunnelName, activeCount := range tunnels {
+			// Determine tunnel type - we need to find the original tunnel info
+			tunnelType := "automatic" // default
+			for _, v := range res {
+				if v.VDOM == vdom {
+					for _, tunnel := range v.Results {
+						if tunnel.Name == tunnelName {
+							tunnelType = tunnel.Type
+							break
+						}
+					}
+				}
+			}
+			m = append(m, prometheus.MustNewConstMetric(tunnelActiveConnections, prometheus.GaugeValue, float64(activeCount), vdom, tunnelName, tunnelType))
+		}
 	}
 	return m, true
 }

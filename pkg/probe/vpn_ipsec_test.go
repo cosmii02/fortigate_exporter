@@ -23,6 +23,9 @@ func TestVPNIPSec(t *testing.T) {
 	# HELP fortigate_ipsec_connections_up Number of active IPsec connections (proxy IDs)
 	# TYPE fortigate_ipsec_connections_up gauge
 	fortigate_ipsec_connections_up{vdom="root"} 1
+	# HELP fortigate_ipsec_tunnel_connections_up Number of active client connections for this IPsec tunnel
+	# TYPE fortigate_ipsec_tunnel_connections_up gauge
+	fortigate_ipsec_tunnel_connections_up{tunnel="tunnel_1",type="automatic",vdom="root"} 1
 	# HELP fortigate_ipsec_tunnel_receive_bytes_total Total number of bytes received over the IPsec tunnel
 	# TYPE fortigate_ipsec_tunnel_receive_bytes_total counter
 	fortigate_ipsec_tunnel_receive_bytes_total{name="tunnel_1-sub",p2serial="1",parent="tunnel_1",vdom="root"} 1.429824e+07
@@ -64,6 +67,9 @@ func TestVPNIPSecWithCommonP2Names(t *testing.T) {
 	# HELP fortigate_ipsec_connections_up Number of active IPsec connections (proxy IDs)
 	# TYPE fortigate_ipsec_connections_up gauge
 	fortigate_ipsec_connections_up{vdom="root"} 4
+	# HELP fortigate_ipsec_tunnel_connections_up Number of active client connections for this IPsec tunnel
+	# TYPE fortigate_ipsec_tunnel_connections_up gauge
+	fortigate_ipsec_tunnel_connections_up{tunnel="My VPN",type="automatic",vdom="root"} 4
 	# HELP fortigate_ipsec_tunnel_receive_bytes_total Total number of bytes received over the IPsec tunnel
 	# TYPE fortigate_ipsec_tunnel_receive_bytes_total counter
 	fortigate_ipsec_tunnel_receive_bytes_total{name="CommonP2",p2serial="22",parent="My VPN",vdom="root"} 0
@@ -116,6 +122,10 @@ func TestVPNIPSecWithDialup(t *testing.T) {
 	# HELP fortigate_ipsec_connections_up Number of active IPsec connections (proxy IDs)
 	# TYPE fortigate_ipsec_connections_up gauge
 	fortigate_ipsec_connections_up{vdom="root"} 3
+	# HELP fortigate_ipsec_tunnel_connections_up Number of active client connections for this IPsec tunnel
+	# TYPE fortigate_ipsec_tunnel_connections_up gauge
+	fortigate_ipsec_tunnel_connections_up{tunnel="nixvpn-split",type="dialup",vdom="root"} 2
+	fortigate_ipsec_tunnel_connections_up{tunnel="tunnel_1",type="automatic",vdom="root"} 1
 	# HELP fortigate_ipsec_tunnel_receive_bytes_total Total number of bytes received over the IPsec tunnel
 	# TYPE fortigate_ipsec_tunnel_receive_bytes_total counter
 	fortigate_ipsec_tunnel_receive_bytes_total{name="nixvpn-split-client1",p2serial="101",parent="nixvpn-split",vdom="root"} 1.024e+06
