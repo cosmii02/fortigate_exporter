@@ -1,6 +1,7 @@
 package probe
 
 import (
+	"errors"
 	"log"
 
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
@@ -34,6 +35,11 @@ func probeSystemFortimanagerStatus(c http.FortiHTTP, meta *TargetMetadata) ([]pr
 
 	var res []SystemFortimanagerStatus
 	if err := c.Get("api/v2/monitor/system/fortimanager/status", "vdom=*", &res); err != nil {
+		var apiErr http.APIError
+		if errors.As(err, &apiErr) && apiErr.StatusCode == 404 {
+			log.Printf("Fortimanager status endpoint not available (HTTP 404), skipping probe")
+			return nil, true
+		}
 		log.Printf("Error: %v", err)
 		return nil, false
 	}

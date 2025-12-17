@@ -55,7 +55,7 @@ func setUpMetricsEndpoint(buildInfo BuildInfo) {
 		"revision":  buildInfo.gitHash,
 		"goversion": buildInfo.goVersion,
 	}).Set(1)
-}
+}	
 
 func getBuildInfo() BuildInfo {
 	// don't overwrite the version if it was set by -ldflags=-X

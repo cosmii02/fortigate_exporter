@@ -32,6 +32,15 @@ type HTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
+type APIError struct {
+	StatusCode int
+	Path       string
+}
+
+func (e APIError) Error() string {
+	return fmt.Sprintf("Response code was %d, expected 200 (path: %q)", e.StatusCode, e.Path)
+}
+
 type fortiTokenClient struct {
 	tgt url.URL
 	hc  HTTPClient
@@ -63,8 +72,9 @@ func (c *fortiTokenClient) Get(path string, query string, obj interface{}) error
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("Response code was %d, expected 200 (path: %q)", resp.StatusCode, path)
+		return APIError{StatusCode: resp.StatusCode, Path: path}
 	}
 
 	b, err := ioutil.ReadAll(resp.Body)
