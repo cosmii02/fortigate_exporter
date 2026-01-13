@@ -1,6 +1,7 @@
 package probe
 
 import (
+	"errors"
 	"log"
 
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
@@ -91,9 +92,35 @@ func probeVirtualWANHealthCheck(c http.FortiHTTP, meta *TargetMetadata) ([]prome
 	}
 
 	var rs []VirtualWanMonitorResponse
+	paths := []string{
+		"api/v2/monitor/virtual-wan/health-check",
+		"api/v2/monitor/virtual-wan/health-check/select",
+	}
+	if versionAtLeast(meta, 7, 6) {
+		paths[0], paths[1] = paths[1], paths[0]
+	}
 
-	if err := c.Get("api/v2/monitor/virtual-wan/health-check", "vdom=*", &rs); err != nil {
-		log.Printf("Error: %v", err)
+	had404 := false
+	for _, path := range paths {
+		var resp []VirtualWanMonitorResponse
+		if err := c.Get(path, "vdom=*", &resp); err != nil {
+			var apiErr http.APIError
+			if errors.As(err, &apiErr) && apiErr.StatusCode == 404 {
+				had404 = true
+				continue
+			}
+			log.Printf("Error: %v", err)
+			return nil, false
+		}
+		rs = resp
+		break
+	}
+
+	if rs == nil {
+		if had404 {
+			log.Printf("Virtual WAN health-check endpoint not available (HTTP 404), skipping probe")
+			return nil, true
+		}
 		return nil, false
 	}
 	m := []prometheus.Metric{}

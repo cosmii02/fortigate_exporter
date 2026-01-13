@@ -409,7 +409,7 @@ To improve security, limit permissions to required ones only (least privilege pr
 |Log/Fortianalyzer/Queue      | loggrp.config      |api/v2/monitor/log/fortianalyzer-queue |
 |Log/DiskUsage                | loggrp.config      |api/v2/monitor/log/current-disk-usage |
 |System/AvailableCertificates | *any*              |api/v2/monitor/system/available-certificates |
-|System/Fortimanager/Status   | sysgrp.cfg         |api/v2/monitor/system/fortimanager/status |
+|System/Fortimanager/Status   | sysgrp.cfg         |api/v2/monitor/system/fortimanager/status<br>api/v2/monitor/system/central-management/status |
 |System/HAStatistics          | sysgrp.cfg         |api/v2/monitor/system/ha-statistics<br>api/v2/cmdb/system/ha |
 |System/Interface             | netgrp.cfg         |api/v2/monitor/system/interface/select |
 |System/LinkMonitor           | sysgrp.cfg         |api/v2/monitor/system/link-monitor |
@@ -422,7 +422,7 @@ To improve security, limit permissions to required ones only (least privilege pr
 |VPN/IPSec                    | vpngrp             |api/v2/monitor/vpn/ipsec |
 |VPN/Ssl/Connections          | vpngrp             |api/v2/monitor/vpn/ssl |
 |VPN/Ssl/Stats                | vpngrp             |api/v2/monitor/vpn/ssl/stats |
-|VirtualWAN/HealthCheck       | netgrp.cfg         |api/v2/monitor/virtual-wan/health-check |
+|VirtualWAN/HealthCheck       | netgrp.cfg         |api/v2/monitor/virtual-wan/health-check<br>api/v2/monitor/virtual-wan/health-check/select |
 |Wifi/APStatus                | wifi               |api/v2/monitor/wifi/ap_status |
 |Wifi/Clients                 | wifi               |api/v2/monitor/wifi/client |
 |Wifi/ManagedAP               | wifi               |api/v2/monitor/wifi/managed_ap |

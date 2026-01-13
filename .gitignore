@@ -11,3 +11,6 @@ fortigate_exporter
 cover.out
 coverage.html
 test-config.yaml
+
+# internal grafanadash
+grafanadash.json
