@@ -3646,7 +3646,6 @@
                 "user",
                 "src_ip",
                 "group",
-                "auth_type",
                 "auth_server",
                 "vdom"
               ]
@@ -3672,7 +3671,6 @@
             "includeByName": {},
             "indexByName": {
               "auth_server": 4,
-              "auth_type": 3,
               "group": 2,
               "src_ip": 1,
               "user": 0,
@@ -3680,7 +3678,6 @@
             },
             "renameByName": {
               "auth_server": "Auth Server",
-              "auth_type": "Auth Type",
               "group": "Group",
               "src_ip": "Source IP",
               "user": "User",

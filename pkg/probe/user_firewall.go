@@ -19,7 +19,7 @@ func probeUserFirewall(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Met
 		firewallUsers = prometheus.NewDesc(
 			"fortigate_user_firewall_info",
 			"Info on authenticated firewall users",
-			[]string{"vdom", "user", "src_ip", "group", "auth_type", "auth_server"}, nil,
+			[]string{"vdom", "user", "src_ip", "group", "auth_server"}, nil,
 		)
 	)
 
@@ -30,17 +30,23 @@ func probeUserFirewall(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Met
 	}
 
 	m := []prometheus.Metric{}
+	seen := map[string]struct{}{}
 	for _, r := range res {
 		for _, user := range r.Results {
 			userName := pickFieldString(user, "user", "user_name", "username", "name")
 			srcIP := pickFieldString(user, "src_ip", "srcip", "src-ip", "ip", "ipaddr")
 			group := pickFieldString(user, "user_group", "group", "usergroup", "grp")
-			authType := normalizeAuthType(pickFieldString(user, "auth_type", "auth-type", "authtype", "type"))
 			authServer := pickFieldString(user, "auth_server", "auth-server", "authserver", "server")
 
-			if userName == "" && srcIP == "" && group == "" && authType == "" && authServer == "" {
+			if userName == "" && srcIP == "" && group == "" && authServer == "" {
 				continue
 			}
+
+			key := strings.Join([]string{r.VDOM, userName, srcIP, group, authServer}, "\x1f")
+			if _, ok := seen[key]; ok {
+				continue
+			}
+			seen[key] = struct{}{}
 
 			m = append(m, prometheus.MustNewConstMetric(
 				firewallUsers,
@@ -50,7 +56,6 @@ func probeUserFirewall(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Met
 				userName,
 				srcIP,
 				group,
-				authType,
 				authServer,
 			))
 		}
@@ -90,11 +95,4 @@ func normalizeFieldString(value interface{}) string {
 		}
 	}
 	return ""
-}
-
-func normalizeAuthType(value string) string {
-	if value == "3" {
-		return "LDAPS"
-	}
-	return value
 }

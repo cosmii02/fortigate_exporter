@@ -19,10 +19,10 @@ func TestUserFirewall(t *testing.T) {
 	em := `
 	# HELP fortigate_user_firewall_info Info on authenticated firewall users
 	# TYPE fortigate_user_firewall_info gauge
-	fortigate_user_firewall_info{auth_server="LDAP1",auth_type="ldap",group="Employees",src_ip="10.0.0.5",user="alice",vdom="root"} 1
-	fortigate_user_firewall_info{auth_server="",auth_type="radius",group="Contractors",src_ip="10.0.0.6",user="bob",vdom="root"} 1
-	fortigate_user_firewall_info{auth_server="",auth_type="LDAPS",group="Employees",src_ip="10.0.0.7",user="dave",vdom="root"} 1
-	fortigate_user_firewall_info{auth_server="",auth_type="local",group="Employees",src_ip="10.0.1.7",user="carol",vdom="vdom2"} 1
+	fortigate_user_firewall_info{auth_server="LDAP1",group="Employees",src_ip="10.0.0.5",user="alice",vdom="root"} 1
+	fortigate_user_firewall_info{auth_server="",group="Contractors",src_ip="10.0.0.6",user="bob",vdom="root"} 1
+	fortigate_user_firewall_info{auth_server="",group="Employees",src_ip="10.0.0.7",user="dave",vdom="root"} 1
+	fortigate_user_firewall_info{auth_server="",group="Employees",src_ip="10.0.1.7",user="carol",vdom="vdom2"} 1
 	`
 
 	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {
