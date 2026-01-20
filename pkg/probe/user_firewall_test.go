@@ -23,6 +23,12 @@ func TestUserFirewall(t *testing.T) {
 	fortigate_user_firewall_info{auth_server="",group="Contractors",src_ip="10.0.0.6",user="bob",vdom="root"} 1
 	fortigate_user_firewall_info{auth_server="",group="Employees",src_ip="10.0.0.7",user="dave",vdom="root"} 1
 	fortigate_user_firewall_info{auth_server="",group="Employees",src_ip="10.0.1.7",user="carol",vdom="vdom2"} 1
+	# HELP fortigate_user_firewall_session_duration_seconds Duration of authenticated firewall sessions in seconds
+	# TYPE fortigate_user_firewall_session_duration_seconds gauge
+	fortigate_user_firewall_session_duration_seconds{auth_server="LDAP1",group="Employees",src_ip="10.0.0.5",user="alice",vdom="root"} 120
+	fortigate_user_firewall_session_duration_seconds{auth_server="",group="Contractors",src_ip="10.0.0.6",user="bob",vdom="root"} 30
+	fortigate_user_firewall_session_duration_seconds{auth_server="",group="Employees",src_ip="10.0.0.7",user="dave",vdom="root"} 60
+	fortigate_user_firewall_session_duration_seconds{auth_server="",group="Employees",src_ip="10.0.1.7",user="carol",vdom="vdom2"} 90
 	`
 
 	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {

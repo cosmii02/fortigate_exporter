@@ -91,6 +91,7 @@ Per-VDOM:
    * `fortigate_system_sdn_connector_last_update_seconds`
  * _User/Firewall_
    * `fortigate_user_firewall_info`
+   * `fortigate_user_firewall_session_duration_seconds`
  * _User/Fsso_
    * `fortigate_user_fsso_info`
  * _VPN/Ssl/Connections_

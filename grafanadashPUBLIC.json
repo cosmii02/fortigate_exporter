@@ -3618,7 +3618,7 @@
             "uid": "ben1jjppecw74c"
           },
           "editorMode": "code",
-          "expr": "fortigate_user_firewall_info{instance=~\"[[firewall]]\"}",
+          "expr": "(\n  fortigate_user_firewall_session_duration_seconds{instance=~\"[[firewall]]\"} / 60\n) or on (vdom, user, src_ip, group, auth_server) (\n  fortigate_user_firewall_info{instance=~\"[[firewall]]\"} * 0\n)",
           "format": "time_series",
           "instant": true,
           "legendFormat": "{{user}}",
@@ -3647,7 +3647,8 @@
                 "src_ip",
                 "group",
                 "auth_server",
-                "vdom"
+                "vdom",
+                "Value"
               ]
             }
           }
@@ -3674,12 +3675,14 @@
               "group": 2,
               "src_ip": 1,
               "user": 0,
-              "vdom": 5
+              "vdom": 5,
+              "Value": 6
             },
             "renameByName": {
               "auth_server": "Auth Server",
               "group": "Group",
-              "src_ip": "Source IP",
+              "Value": "Duration (min)",
+              "src_ip": "Tunnel IP",
               "user": "User",
               "vdom": "VDOM"
             }
