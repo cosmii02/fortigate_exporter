@@ -24,13 +24,13 @@ import (
 	"runtime/debug"
 	"strings"
 
-	"github.com/bluecmd/fortigate_exporter/pkg/probe"
-
-	"github.com/bluecmd/fortigate_exporter/internal/config"
-	fortiHTTP "github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+
+	"github.com/bluecmd/fortigate_exporter/internal/config"
+	fortiHTTP "github.com/bluecmd/fortigate_exporter/pkg/http"
+	"github.com/bluecmd/fortigate_exporter/pkg/probe"
 )
 
 var (
@@ -55,7 +55,7 @@ func setUpMetricsEndpoint(buildInfo BuildInfo) {
 		"revision":  buildInfo.gitHash,
 		"goversion": buildInfo.goVersion,
 	}).Set(1)
-}	
+}
 
 func getBuildInfo() BuildInfo {
 	// don't overwrite the version if it was set by -ldflags=-X
