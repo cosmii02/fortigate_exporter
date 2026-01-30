@@ -24,6 +24,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/bluecmd/fortigate_exporter/internal/config"
@@ -109,8 +110,7 @@ func (p *ProbeCollector) Probe(ctx context.Context, target map[string]string, hc
 	includedProbes := savedConfig.AuthKeys[config.Target(u.String())].Probes.Include
 	excludedProbes := savedConfig.AuthKeys[config.Target(u.String())].Probes.Exclude
 
-	// TODO: Make parallel
-	success := true
+	probesToRun := make([]probeDetailedFunc, 0)
 	for _, aProbe := range []probeDetailedFunc{
 		// Always keep probeSystemTime on top of the list to have the probe processed first.
 		// Therefore time returned is more accurate when integrated in Prometheus because
@@ -174,18 +174,58 @@ func (p *ProbeCollector) Probe(ctx context.Context, target map[string]string, hc
 			}
 		}
 
-		if !wanted {
-			continue
+		if wanted {
+			probesToRun = append(probesToRun, aProbe)
 		}
-
-		start := time.Now()
-		m, ok := aProbe.function(c, meta)
-		log.Printf("Probe %q finished in %.3f seconds (ok=%t)", aProbe.name, time.Since(start).Seconds(), ok)
-		if !ok {
-			success = false
-		}
-		p.metrics = append(p.metrics, m...)
 	}
+
+	success := true
+	if len(probesToRun) == 0 {
+		return success, nil
+	}
+
+	workers := savedConfig.ProbeConcurrency
+	if workers < 1 {
+		workers = 1
+	}
+	if workers > len(probesToRun) {
+		workers = len(probesToRun)
+	}
+
+	jobs := make(chan probeDetailedFunc)
+	var wg sync.WaitGroup
+	var mu sync.Mutex
+
+	for i := 0; i < workers; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for aProbe := range jobs {
+				start := time.Now()
+				m, ok := aProbe.function(c, meta)
+				log.Printf("Probe %q finished in %.3f seconds (ok=%t)", aProbe.name, time.Since(start).Seconds(), ok)
+				mu.Lock()
+				if !ok {
+					success = false
+				}
+				if len(m) != 0 {
+					p.metrics = append(p.metrics, m...)
+				}
+				mu.Unlock()
+			}
+		}()
+	}
+
+enqueue:
+	for _, aProbe := range probesToRun {
+		select {
+		case <-ctx.Done():
+			break enqueue
+		case jobs <- aProbe:
+		}
+	}
+	close(jobs)
+	wg.Wait()
 
 	return success, nil
 }

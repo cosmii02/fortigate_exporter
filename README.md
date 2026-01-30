@@ -391,6 +391,7 @@ fs124e:
 | -extra-ca-certs | (none) | comma-separated files containing extra PEMs to trust for TLS connections in addition to the system trust store |
 | -max-bgp-paths  | 10000  | Sets maximum amount of BGP paths to fetch, value is per IP stack version (IPv4 & IPv6) |
 | -max-vpn-users  | 0      | Sets maximum amount of VPN users to fetch (0 eq. none by default) |
+| -probe-concurrency | 4   | Number of probes to run in parallel |
 
 ### FortiGate Configuration
 

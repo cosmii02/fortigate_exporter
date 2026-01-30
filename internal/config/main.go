@@ -10,25 +10,27 @@ import (
 )
 
 type FortiExporterParameter struct {
-	AuthFile      *string
-	Listen        *string
-	ScrapeTimeout *int
-	TLSTimeout    *int
-	TLSInsecure   *bool
-	TlsExtraCAs   *string
-	MaxBGPPaths   *int
-	MaxVPNUsers   *int
+	AuthFile         *string
+	Listen           *string
+	ScrapeTimeout    *int
+	TLSTimeout       *int
+	TLSInsecure      *bool
+	TlsExtraCAs      *string
+	MaxBGPPaths      *int
+	MaxVPNUsers      *int
+	ProbeConcurrency *int
 }
 
 type FortiExporterConfig struct {
-	AuthKeys      AuthKeys
-	Listen        string
-	ScrapeTimeout int
-	TLSTimeout    int
-	TLSInsecure   bool
-	TlsExtraCAs   []LocalCert
-	MaxBGPPaths   int
-	MaxVPNUsers   int
+	AuthKeys         AuthKeys
+	Listen           string
+	ScrapeTimeout    int
+	TLSTimeout       int
+	TLSInsecure      bool
+	TlsExtraCAs      []LocalCert
+	MaxBGPPaths      int
+	MaxVPNUsers      int
+	ProbeConcurrency int
 }
 
 type AuthKeys map[Target]TargetAuth
@@ -54,14 +56,15 @@ type LocalCert struct {
 
 var (
 	parameter = FortiExporterParameter{
-		AuthFile:      flag.String("auth-file", "fortigate-key.yaml", "file containing the authentication map to use when connecting to a Fortigate device"),
-		Listen:        flag.String("listen", ":9710", "address to listen on"),
-		ScrapeTimeout: flag.Int("scrape-timeout", 30, "max seconds to allow a scrape to take"),
-		TLSTimeout:    flag.Int("https-timeout", 10, "TLS Handshake timeout in seconds"),
-		TLSInsecure:   flag.Bool("insecure", false, "Allow insecure certificates"),
-		TlsExtraCAs:   flag.String("extra-ca-certs", "", "comma-separated files containing extra PEMs to trust for TLS connections in addition to the system trust store"),
-		MaxBGPPaths:   flag.Int("max-bgp-paths", 10000, "How many BGP Paths to receive when counting routes, needs to be greater than or equal to the number of routes or metrics will not be generated"),
-		MaxVPNUsers:   flag.Int("max-vpn-users", 0, "How many VPN Users to receive when counting users, needs to be greater than or equal the number of users or metrics will not be generated (0 eq. none by default)"),
+		AuthFile:         flag.String("auth-file", "fortigate-key.yaml", "file containing the authentication map to use when connecting to a Fortigate device"),
+		Listen:           flag.String("listen", ":9710", "address to listen on"),
+		ScrapeTimeout:    flag.Int("scrape-timeout", 30, "max seconds to allow a scrape to take"),
+		TLSTimeout:       flag.Int("https-timeout", 10, "TLS Handshake timeout in seconds"),
+		TLSInsecure:      flag.Bool("insecure", false, "Allow insecure certificates"),
+		TlsExtraCAs:      flag.String("extra-ca-certs", "", "comma-separated files containing extra PEMs to trust for TLS connections in addition to the system trust store"),
+		MaxBGPPaths:      flag.Int("max-bgp-paths", 10000, "How many BGP Paths to receive when counting routes, needs to be greater than or equal to the number of routes or metrics will not be generated"),
+		MaxVPNUsers:      flag.Int("max-vpn-users", 0, "How many VPN Users to receive when counting users, needs to be greater than or equal the number of users or metrics will not be generated (0 eq. none by default)"),
+		ProbeConcurrency: flag.Int("probe-concurrency", 4, "How many probes to run in parallel"),
 	}
 
 	savedConfig *FortiExporterConfig
@@ -84,12 +87,13 @@ func ReInit() error {
 	flag.Parse()
 
 	savedConfig = &FortiExporterConfig{
-		Listen:        *parameter.Listen,
-		ScrapeTimeout: *parameter.ScrapeTimeout,
-		TLSTimeout:    *parameter.TLSTimeout,
-		TLSInsecure:   *parameter.TLSInsecure,
-		MaxBGPPaths:   *parameter.MaxBGPPaths,
-		MaxVPNUsers:   *parameter.MaxVPNUsers,
+		Listen:           *parameter.Listen,
+		ScrapeTimeout:    *parameter.ScrapeTimeout,
+		TLSTimeout:       *parameter.TLSTimeout,
+		TLSInsecure:      *parameter.TLSInsecure,
+		MaxBGPPaths:      *parameter.MaxBGPPaths,
+		MaxVPNUsers:      *parameter.MaxVPNUsers,
+		ProbeConcurrency: *parameter.ProbeConcurrency,
 	}
 
 	// parse AuthKeys
