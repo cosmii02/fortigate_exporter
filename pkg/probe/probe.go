@@ -24,6 +24,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/bluecmd/fortigate_exporter/internal/config"
 	"github.com/bluecmd/fortigate_exporter/internal/version"
@@ -177,7 +178,9 @@ func (p *ProbeCollector) Probe(ctx context.Context, target map[string]string, hc
 			continue
 		}
 
+		start := time.Now()
 		m, ok := aProbe.function(c, meta)
+		log.Printf("Probe %q finished in %.3f seconds (ok=%t)", aProbe.name, time.Since(start).Seconds(), ok)
 		if !ok {
 			success = false
 		}

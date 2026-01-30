@@ -14,3 +14,4 @@ test-config.yaml
 
 # internal grafanadash
 grafanadash.json
+.env
