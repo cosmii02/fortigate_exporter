@@ -15,6 +15,16 @@ func probeVPNIPSec(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric,
 			"Status of IPsec tunnel (0 - Down, 1 - Up)",
 			[]string{"vdom", "name", "p2serial", "parent"}, nil,
 		)
+		phase1Status = prometheus.NewDesc(
+			"fortigate_ipsec_phase1_up",
+			"Status of IPsec phase 1 tunnel (0 - Down, 1 - Up)",
+			[]string{"vdom", "name", "type"}, nil,
+		)
+		phase2Status = prometheus.NewDesc(
+			"fortigate_ipsec_phase2_up",
+			"Status of IPsec phase 2 selector aggregated by parent/name (0 - Down, 1 - Up)",
+			[]string{"vdom", "parent", "name"}, nil,
+		)
 		transmitted = prometheus.NewDesc(
 			"fortigate_ipsec_tunnel_transmit_bytes_total",
 			"Total number of bytes transmitted over the IPsec tunnel",
@@ -84,11 +94,15 @@ func probeVPNIPSec(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric,
 
 	// Maps to track per-tunnel connection counts
 	tunnelActiveConns := make(map[string]map[string]int) // vdom -> tunnel -> count
+	tunnelTypes := make(map[string]map[string]string)    // vdom -> tunnel -> type
 
 	for _, v := range res {
 		// Initialize per-vdom tunnel connection map
 		if tunnelActiveConns[v.VDOM] == nil {
 			tunnelActiveConns[v.VDOM] = make(map[string]int)
+		}
+		if tunnelTypes[v.VDOM] == nil {
+			tunnelTypes[v.VDOM] = make(map[string]string)
 		}
 
 		for _, i := range v.Results {
@@ -97,9 +111,11 @@ func probeVPNIPSec(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric,
 
 			// Initialize connection count for this tunnel
 			tunnelActiveConns[v.VDOM][i.Name] = 0
+			tunnelTypes[v.VDOM][i.Name] = i.Type
 
 			// Check if tunnel has any active proxy IDs
 			hasActiveProxy := false
+			p2StatusByName := make(map[string]float64)
 			for _, t := range i.ProxyID {
 				// Count connections
 				vdomTotalConnections[v.VDOM]++
@@ -114,14 +130,23 @@ func probeVPNIPSec(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric,
 				if t.Status == "up" {
 					s = 1.0
 				}
+				if p2StatusByName[t.Name] < s {
+					p2StatusByName[t.Name] = s
+				}
 				m = append(m, prometheus.MustNewConstMetric(status, prometheus.GaugeValue, s, v.VDOM, t.Name, strconv.Itoa(t.P2serial), i.Name))
 				m = append(m, prometheus.MustNewConstMetric(transmitted, prometheus.CounterValue, t.Outgoing, v.VDOM, t.Name, strconv.Itoa(t.P2serial), i.Name))
 				m = append(m, prometheus.MustNewConstMetric(received, prometheus.CounterValue, t.Incoming, v.VDOM, t.Name, strconv.Itoa(t.P2serial), i.Name))
 			}
 
+			phase1Up := 0.0
 			// If tunnel has at least one active proxy ID, count it as active
 			if hasActiveProxy {
+				phase1Up = 1.0
 				vdomActiveTunnels[v.VDOM]++
+			}
+			m = append(m, prometheus.MustNewConstMetric(phase1Status, prometheus.GaugeValue, phase1Up, v.VDOM, i.Name, i.Type))
+			for p2Name, p2Up := range p2StatusByName {
+				m = append(m, prometheus.MustNewConstMetric(phase2Status, prometheus.GaugeValue, p2Up, v.VDOM, i.Name, p2Name))
 			}
 		}
 	}
@@ -137,17 +162,9 @@ func probeVPNIPSec(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric,
 	// Add per-tunnel connection counts
 	for vdom, tunnels := range tunnelActiveConns {
 		for tunnelName, activeCount := range tunnels {
-			// Determine tunnel type - we need to find the original tunnel info
-			tunnelType := "automatic" // default
-			for _, v := range res {
-				if v.VDOM == vdom {
-					for _, tunnel := range v.Results {
-						if tunnel.Name == tunnelName {
-							tunnelType = tunnel.Type
-							break
-						}
-					}
-				}
+			tunnelType := tunnelTypes[vdom][tunnelName]
+			if tunnelType == "" {
+				tunnelType = "automatic"
 			}
 			m = append(m, prometheus.MustNewConstMetric(tunnelActiveConnections, prometheus.GaugeValue, float64(activeCount), vdom, tunnelName, tunnelType))
 		}

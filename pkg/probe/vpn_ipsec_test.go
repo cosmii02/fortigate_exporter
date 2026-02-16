@@ -20,12 +20,18 @@ func TestVPNIPSec(t *testing.T) {
 	# HELP fortigate_ipsec_connections_total Total number of configured IPsec connections (proxy IDs)
 	# TYPE fortigate_ipsec_connections_total gauge
 	fortigate_ipsec_connections_total{vdom="root"} 2
-	# HELP fortigate_ipsec_connections_up Number of active IPsec connections (proxy IDs)
-	# TYPE fortigate_ipsec_connections_up gauge
-	fortigate_ipsec_connections_up{vdom="root"} 1
-	# HELP fortigate_ipsec_tunnel_connections_up Number of active client connections for this IPsec tunnel
-	# TYPE fortigate_ipsec_tunnel_connections_up gauge
-	fortigate_ipsec_tunnel_connections_up{tunnel="tunnel_1",type="automatic",vdom="root"} 1
+		# HELP fortigate_ipsec_connections_up Number of active IPsec connections (proxy IDs)
+		# TYPE fortigate_ipsec_connections_up gauge
+		fortigate_ipsec_connections_up{vdom="root"} 1
+		# HELP fortigate_ipsec_phase1_up Status of IPsec phase 1 tunnel (0 - Down, 1 - Up)
+		# TYPE fortigate_ipsec_phase1_up gauge
+		fortigate_ipsec_phase1_up{name="tunnel_1",type="automatic",vdom="root"} 1
+		# HELP fortigate_ipsec_phase2_up Status of IPsec phase 2 selector aggregated by parent/name (0 - Down, 1 - Up)
+		# TYPE fortigate_ipsec_phase2_up gauge
+		fortigate_ipsec_phase2_up{name="tunnel_1-sub",parent="tunnel_1",vdom="root"} 1
+		# HELP fortigate_ipsec_tunnel_connections_up Number of active client connections for this IPsec tunnel
+		# TYPE fortigate_ipsec_tunnel_connections_up gauge
+		fortigate_ipsec_tunnel_connections_up{tunnel="tunnel_1",type="automatic",vdom="root"} 1
 	# HELP fortigate_ipsec_tunnel_receive_bytes_total Total number of bytes received over the IPsec tunnel
 	# TYPE fortigate_ipsec_tunnel_receive_bytes_total counter
 	fortigate_ipsec_tunnel_receive_bytes_total{name="tunnel_1-sub",p2serial="1",parent="tunnel_1",vdom="root"} 1.429824e+07
@@ -64,12 +70,19 @@ func TestVPNIPSecWithCommonP2Names(t *testing.T) {
 	# HELP fortigate_ipsec_connections_total Total number of configured IPsec connections (proxy IDs)
 	# TYPE fortigate_ipsec_connections_total gauge
 	fortigate_ipsec_connections_total{vdom="root"} 6
-	# HELP fortigate_ipsec_connections_up Number of active IPsec connections (proxy IDs)
-	# TYPE fortigate_ipsec_connections_up gauge
-	fortigate_ipsec_connections_up{vdom="root"} 4
-	# HELP fortigate_ipsec_tunnel_connections_up Number of active client connections for this IPsec tunnel
-	# TYPE fortigate_ipsec_tunnel_connections_up gauge
-	fortigate_ipsec_tunnel_connections_up{tunnel="My VPN",type="automatic",vdom="root"} 4
+		# HELP fortigate_ipsec_connections_up Number of active IPsec connections (proxy IDs)
+		# TYPE fortigate_ipsec_connections_up gauge
+		fortigate_ipsec_connections_up{vdom="root"} 4
+		# HELP fortigate_ipsec_phase1_up Status of IPsec phase 1 tunnel (0 - Down, 1 - Up)
+		# TYPE fortigate_ipsec_phase1_up gauge
+		fortigate_ipsec_phase1_up{name="My VPN",type="automatic",vdom="root"} 1
+		# HELP fortigate_ipsec_phase2_up Status of IPsec phase 2 selector aggregated by parent/name (0 - Down, 1 - Up)
+		# TYPE fortigate_ipsec_phase2_up gauge
+		fortigate_ipsec_phase2_up{name="CommonP2",parent="My VPN",vdom="root"} 1
+		fortigate_ipsec_phase2_up{name="some-network",parent="My VPN",vdom="root"} 1
+		# HELP fortigate_ipsec_tunnel_connections_up Number of active client connections for this IPsec tunnel
+		# TYPE fortigate_ipsec_tunnel_connections_up gauge
+		fortigate_ipsec_tunnel_connections_up{tunnel="My VPN",type="automatic",vdom="root"} 4
 	# HELP fortigate_ipsec_tunnel_receive_bytes_total Total number of bytes received over the IPsec tunnel
 	# TYPE fortigate_ipsec_tunnel_receive_bytes_total counter
 	fortigate_ipsec_tunnel_receive_bytes_total{name="CommonP2",p2serial="22",parent="My VPN",vdom="root"} 0
@@ -119,12 +132,21 @@ func TestVPNIPSecWithDialup(t *testing.T) {
 	# HELP fortigate_ipsec_connections_total Total number of configured IPsec connections (proxy IDs)
 	# TYPE fortigate_ipsec_connections_total gauge
 	fortigate_ipsec_connections_total{vdom="root"} 3
-	# HELP fortigate_ipsec_connections_up Number of active IPsec connections (proxy IDs)
-	# TYPE fortigate_ipsec_connections_up gauge
-	fortigate_ipsec_connections_up{vdom="root"} 3
-	# HELP fortigate_ipsec_tunnel_connections_up Number of active client connections for this IPsec tunnel
-	# TYPE fortigate_ipsec_tunnel_connections_up gauge
-	fortigate_ipsec_tunnel_connections_up{tunnel="nixvpn-split",type="dialup",vdom="root"} 2
+		# HELP fortigate_ipsec_connections_up Number of active IPsec connections (proxy IDs)
+		# TYPE fortigate_ipsec_connections_up gauge
+		fortigate_ipsec_connections_up{vdom="root"} 3
+		# HELP fortigate_ipsec_phase1_up Status of IPsec phase 1 tunnel (0 - Down, 1 - Up)
+		# TYPE fortigate_ipsec_phase1_up gauge
+		fortigate_ipsec_phase1_up{name="nixvpn-split",type="dialup",vdom="root"} 1
+		fortigate_ipsec_phase1_up{name="tunnel_1",type="automatic",vdom="root"} 1
+		# HELP fortigate_ipsec_phase2_up Status of IPsec phase 2 selector aggregated by parent/name (0 - Down, 1 - Up)
+		# TYPE fortigate_ipsec_phase2_up gauge
+		fortigate_ipsec_phase2_up{name="nixvpn-split-client1",parent="nixvpn-split",vdom="root"} 1
+		fortigate_ipsec_phase2_up{name="nixvpn-split-client2",parent="nixvpn-split",vdom="root"} 1
+		fortigate_ipsec_phase2_up{name="tunnel_1-sub",parent="tunnel_1",vdom="root"} 1
+		# HELP fortigate_ipsec_tunnel_connections_up Number of active client connections for this IPsec tunnel
+		# TYPE fortigate_ipsec_tunnel_connections_up gauge
+		fortigate_ipsec_tunnel_connections_up{tunnel="nixvpn-split",type="dialup",vdom="root"} 2
 	fortigate_ipsec_tunnel_connections_up{tunnel="tunnel_1",type="automatic",vdom="root"} 1
 	# HELP fortigate_ipsec_tunnel_receive_bytes_total Total number of bytes received over the IPsec tunnel
 	# TYPE fortigate_ipsec_tunnel_receive_bytes_total counter
