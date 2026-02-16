@@ -3917,8 +3917,8 @@
                 "type": "prometheus",
                 "uid": "ben1jjppecw74c"
               },
-              "expr": "fortigate_virtual_wan_status{instance=~\"[[firewall]]\", state=\"up\"} != 0\r",
-              "legendFormat": "{{interface}}",
+              "expr": "min by (instance, vdom, interface) (fortigate_virtual_wan_status{instance=~\"[[firewall]]\",interface=~\"[[sdwan]]\",state=\"up\"})",
+              "legendFormat": "{{instance}} {{interface}}",
               "refId": "A"
             }
           ],
@@ -4014,8 +4014,8 @@
                 "type": "prometheus",
                 "uid": "ben1jjppecw74c"
               },
-              "expr": "fortigate_virtual_wan_latency_seconds{instance=~\"[[firewall]]\"}\r",
-              "legendFormat": "{{interface}}",
+              "expr": "max by (instance, vdom, interface) (fortigate_virtual_wan_latency_seconds{instance=~\"[[firewall]]\",interface=~\"[[sdwan]]\"})",
+              "legendFormat": "{{instance}} {{interface}}",
               "refId": "A"
             }
           ],
@@ -4111,8 +4111,8 @@
                 "type": "prometheus",
                 "uid": "ben1jjppecw74c"
               },
-              "expr": "fortigate_virtual_wan_packet_sent_total{instance=~\"[[firewall]]\"}\r",
-              "legendFormat": "{{interface}} sent",
+              "expr": "sum by (instance, vdom, interface) (fortigate_virtual_wan_packet_sent_total{instance=~\"[[firewall]]\",interface=~\"[[sdwan]]\"})",
+              "legendFormat": "{{instance}} {{interface}} sent",
               "refId": "A"
             },
             {
@@ -4120,8 +4120,8 @@
                 "type": "prometheus",
                 "uid": "ben1jjppecw74c"
               },
-              "expr": "fortigate_virtual_wan_packet_received_total{instance=~\"[[firewall]]\"}",
-              "legendFormat": "{{interface}} received",
+              "expr": "sum by (instance, vdom, interface) (fortigate_virtual_wan_packet_received_total{instance=~\"[[firewall]]\",interface=~\"[[sdwan]]\"})",
+              "legendFormat": "{{instance}} {{interface}} received",
               "refId": "B"
             }
           ],
@@ -4200,7 +4200,7 @@
                 "type": "prometheus",
                 "uid": "ben1jjppecw74c"
               },
-              "expr": "fortigate_virtual_wan_status_change_time_seconds{instance=~\"[[firewall]]\",interface=\"[[sdwan]]\"} *1000",
+              "expr": "max by (instance, vdom, interface) (fortigate_virtual_wan_status_change_time_seconds{instance=~\"[[firewall]]\",interface=~\"[[sdwan]]\"}) *1000",
               "legendFormat": "{{sdwan}}",
               "refId": "A"
             }
@@ -4297,8 +4297,8 @@
                 "type": "prometheus",
                 "uid": "ben1jjppecw74c"
               },
-              "expr": "fortigate_virtual_wan_latency_jitter_seconds{instance=~\"[[firewall]]\"}\r",
-              "legendFormat": "{{interface}}",
+              "expr": "max by (instance, vdom, interface) (fortigate_virtual_wan_latency_jitter_seconds{instance=~\"[[firewall]]\",interface=~\"[[sdwan]]\"})",
+              "legendFormat": "{{instance}} {{interface}}",
               "refId": "A"
             }
           ],
@@ -4394,8 +4394,8 @@
                 "type": "prometheus",
                 "uid": "ben1jjppecw74c"
               },
-              "expr": "fortigate_virtual_wan_active_sessions{instance=~\"[[firewall]]\"}\r",
-              "legendFormat": "{{interface}}",
+              "expr": "max by (instance, vdom, interface) (fortigate_virtual_wan_active_sessions{instance=~\"[[firewall]]\",interface=~\"[[sdwan]]\"})",
+              "legendFormat": "{{instance}} {{interface}}",
               "refId": "A"
             }
           ],
@@ -4491,8 +4491,8 @@
                 "type": "prometheus",
                 "uid": "ben1jjppecw74c"
               },
-              "expr": "fortigate_virtual_wan_packet_loss_ratio{instance=~\"[[firewall]]\"}\r",
-              "legendFormat": "{{interface}}",
+              "expr": "max by (instance, vdom, interface) (fortigate_virtual_wan_packet_loss_ratio{instance=~\"[[firewall]]\",interface=~\"[[sdwan]]\"})",
+              "legendFormat": "{{instance}} {{interface}}",
               "refId": "A"
             }
           ],
@@ -4588,11 +4588,11 @@
                 "type": "prometheus",
                 "uid": "ben1jjppecw74c"
               },
-              "expr": "irate(fortigate_virtual_wan_bandwidth_tx_byte_per_second{instance=\"[[firewall]]\",interface=~\"[[sdwan]]\"}[1m]) * 8",
+              "expr": "max by (instance, vdom, interface) (fortigate_virtual_wan_bandwidth_tx_byte_per_second{instance=~\"[[firewall]]\",interface=~\"[[sdwan]]\"}) * 8",
               "instant": false,
               "interval": "",
               "intervalFactor": 1,
-              "legendFormat": "{{interface}} TX",
+              "legendFormat": "{{instance}} {{interface}} TX",
               "refId": "A"
             },
             {
@@ -4600,10 +4600,10 @@
                 "type": "prometheus",
                 "uid": "ben1jjppecw74c"
               },
-              "expr": "irate(fortigate_virtual_wan_bandwidth_rx_byte_per_second{instance=\"[[firewall]]\",interface=~\"[[sdwan]]\"}[1m]) * 8\r",
+              "expr": "max by (instance, vdom, interface) (fortigate_virtual_wan_bandwidth_rx_byte_per_second{instance=~\"[[firewall]]\",interface=~\"[[sdwan]]\"}) * 8",
               "hide": false,
               "interval": "",
-              "legendFormat": "{{interface}} RX",
+              "legendFormat": "{{instance}} {{interface}} RX",
               "refId": "B"
             }
           ],
