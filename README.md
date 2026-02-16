@@ -102,8 +102,6 @@ Per-VDOM:
    * `fortigate_vpn_ssl_tunnels`
    * `fortigate_vpn_ssl_connections`
  * _VPN/IPSec_
-   * `fortigate_ipsec_phase1_up`
-   * `fortigate_ipsec_phase2_up`
    * `fortigate_ipsec_tunnel_receive_bytes_total`
    * `fortigate_ipsec_tunnel_transmit_bytes_total`
    * `fortigate_ipsec_tunnel_up`

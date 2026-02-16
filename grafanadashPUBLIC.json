@@ -3522,7 +3522,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "fortigate_ipsec_phase2_up{instance=~\"[[firewall]]\",vdom=~\"[[vdom]]\",parent=~\"[[phase1]]\",name=~\"[[phase2]]\"}",
+          "expr": "fortigate_ipsec_tunnel_up{instance=\"[[firewall]]\"}",
           "format": "table",
           "instant": true,
           "legendFormat": "__auto",
@@ -3537,7 +3537,6 @@
           "options": {
             "include": {
               "names": [
-                "vdom",
                 "name",
                 "parent",
                 "Value"
@@ -3546,37 +3545,19 @@
           }
         },
         {
-          "id": "sortBy",
-          "options": {
-            "fields": {},
-            "sort": [
-              {
-                "desc": false,
-                "field": "parent"
-              },
-              {
-                "desc": false,
-                "field": "name"
-              }
-            ]
-          }
-        },
-        {
           "id": "organize",
           "options": {
             "excludeByName": {},
             "includeByName": {},
             "indexByName": {
-              "Value": 3,
+              "Value": 2,
               "name": 1,
-              "parent": 0,
-              "vdom": 2
+              "parent": 0
             },
             "renameByName": {
               "Value": "Up / Down",
               "name": "Phase 2",
-              "parent": "Phase 1",
-              "vdom": "VDOM"
+              "parent": "Phase 1"
             }
           }
         }
@@ -3816,11 +3797,11 @@
             "type": "prometheus",
             "uid": "ben1jjppecw74c"
           },
-          "expr": "sum by (instance, vdom, parent, name) (rate(fortigate_ipsec_tunnel_receive_bytes_total{instance=~\"[[firewall]]\",vdom=~\"[[vdom]]\",parent=~\"[[phase1]]\",name=~\"[[phase2]]\"}[1m])) * 8",
+          "expr": "rate(fortigate_ipsec_tunnel_receive_bytes_total{instance=\"[[firewall]]\",parent=~\"[[phase1]]\",name=~\"[[phase2]]\"}[1m]) * 8",
           "instant": false,
           "interval": "",
           "intervalFactor": 1,
-          "legendFormat": "{{parent}}/{{name}} receive",
+          "legendFormat": "{{name}} receive",
           "refId": "A"
         },
         {
@@ -3828,9 +3809,9 @@
             "type": "prometheus",
             "uid": "ben1jjppecw74c"
           },
-          "expr": "sum by (instance, vdom, parent, name) (rate(fortigate_ipsec_tunnel_transmit_bytes_total{instance=~\"[[firewall]]\",vdom=~\"[[vdom]]\",parent=~\"[[phase1]]\",name=~\"[[phase2]]\"}[1m])) * 8",
+          "expr": "rate(fortigate_ipsec_tunnel_receive_bytes_total{instance=\"[[firewall]]\",parent=~\"[[phase1]]\",name=~\"[[phase2]]\"}[1m]) * 8\r",
           "interval": "",
-          "legendFormat": "{{parent}}/{{name}} transmit",
+          "legendFormat": "{{name}} transmit",
           "refId": "B"
         }
       ],
@@ -5822,13 +5803,13 @@
           "type": "prometheus",
           "uid": "ben1jjppecw74c"
         },
-        "definition": "label_values(fortigate_ipsec_phase1_up{instance=~\"[[firewall]]\",vdom=~\"[[vdom]]\"}, name)",
+        "definition": "fortigate_ipsec_tunnel_up{instance=~\"[[firewall]]\"}",
         "includeAll": true,
         "name": "phase1",
         "options": [],
-        "query": "label_values(fortigate_ipsec_phase1_up{instance=~\"[[firewall]]\",vdom=~\"[[vdom]]\"}, name)",
+        "query": "fortigate_ipsec_tunnel_up{instance=~\"[[firewall]]\"}",
         "refresh": 1,
-        "regex": "",
+        "regex": "/.*parent=\"([^\"]*).*/",
         "type": "query"
       },
       {
@@ -5840,13 +5821,13 @@
           "type": "prometheus",
           "uid": "ben1jjppecw74c"
         },
-        "definition": "label_values(fortigate_ipsec_phase2_up{instance=~\"[[firewall]]\",vdom=~\"[[vdom]]\",parent=~\"[[phase1]]\"}, name)",
+        "definition": "fortigate_ipsec_tunnel_up{instance=~\"[[firewall]]\"}",
         "includeAll": true,
         "name": "phase2",
         "options": [],
-        "query": "label_values(fortigate_ipsec_phase2_up{instance=~\"[[firewall]]\",vdom=~\"[[vdom]]\",parent=~\"[[phase1]]\"}, name)",
+        "query": "fortigate_ipsec_tunnel_up{instance=~\"[[firewall]]\"}",
         "refresh": 1,
-        "regex": "",
+        "regex": "/.*name=\"([^\"]*).*/",
         "type": "query"
       },
       {
