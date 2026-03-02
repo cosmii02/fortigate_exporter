@@ -859,7 +859,7 @@
           "expr": "fortigate_ha_member_has_role{instance=~\"[[firewall]]\",role=\"root_master\"}",
           "format": "time_series",
           "instant": true,
-          "legendFormat": "{{serial}} master",
+          "legendFormat": "{{hostname}} role",
           "refId": "C"
         }
       ],
