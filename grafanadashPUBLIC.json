@@ -210,7 +210,7 @@
             "type": "prometheus",
             "uid": "ben1jjppecw74c"
           },
-          "expr": "fortigate_version_info{instance=~\"[[firewall]]\"}",
+          "expr": "(fortigate_version_info{instance=~\"[[firewall]]\"} and on (instance, serial) (fortigate_ha_member_has_role{instance=~\"[[firewall]]\",role=\"root_master\"} == 1)) or (fortigate_version_info{instance=~\"[[firewall]]\"} unless on (instance) fortigate_ha_member_has_role{instance=~\"[[firewall]]\",role=\"root_master\"})",
           "format": "time_series",
           "instant": true,
           "legendFormat": "{{version}}",
@@ -764,7 +764,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "fortigate_version_info{instance=~\"[[firewall]]\"}",
+          "expr": "(fortigate_version_info{instance=~\"[[firewall]]\"} and on (instance, serial) (fortigate_ha_member_has_role{instance=~\"[[firewall]]\",role=\"root_master\"} == 1)) or (fortigate_version_info{instance=~\"[[firewall]]\"} unless on (instance) fortigate_ha_member_has_role{instance=~\"[[firewall]]\",role=\"root_master\"})",
           "format": "time_series",
           "instant": true,
           "legendFormat": "{{serial}}",
@@ -814,7 +814,91 @@
           },
           "unit": "percent"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Role"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "0": {
+                        "color": "#FFFFFF",
+                        "index": 0,
+                        "text": "Secondary"
+                      },
+                      "1": {
+                        "color": "#FFFFFF",
+                        "index": 1,
+                        "text": "Master"
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Hostname"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "pattern": ".*(?:-b|2)$",
+                      "result": {
+                        "color": "#FF9830",
+                        "index": 1
+                      }
+                    },
+                    "type": "regex"
+                  },
+                  {
+                    "options": {
+                      "pattern": ".*",
+                      "result": {
+                        "color": "#5794F2",
+                        "index": 0
+                      }
+                    },
+                    "type": "regex"
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "applyToRow": true,
+                  "mode": "basic",
+                  "type": "color-background"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 5,
@@ -835,7 +919,7 @@
             "uid": "ben1jjppecw74c"
           },
           "expr": "fortigate_ha_member_cpu_usage_ratio{instance=~\"[[firewall]]\"} * 100",
-          "format": "time_series",
+          "format": "table",
           "instant": true,
           "legendFormat": "{{hostname}} CPU",
           "refId": "A"
@@ -846,7 +930,7 @@
             "uid": "ben1jjppecw74c"
           },
           "expr": "fortigate_ha_member_memory_usage_ratio{instance=~\"[[firewall]]\"} * 100",
-          "format": "time_series",
+          "format": "table",
           "instant": true,
           "legendFormat": "{{hostname}} Mem",
           "refId": "B"
@@ -856,8 +940,8 @@
             "type": "prometheus",
             "uid": "ben1jjppecw74c"
           },
-          "expr": "fortigate_ha_member_has_role{instance=~\"[[firewall]]\",role=\"root_master\"}",
-          "format": "time_series",
+          "expr": "fortigate_ha_member_has_role{instance=~\"[[firewall]]\",role=\"root_master\"} * on (instance, serial) group_left(hostname, vdom) fortigate_ha_member_info{instance=~\"[[firewall]]\"}",
+          "format": "table",
           "instant": true,
           "legendFormat": "{{hostname}} role",
           "refId": "C"
@@ -866,26 +950,105 @@
       "title": "HA Members (CPU/Mem/Role)",
       "transformations": [
         {
-          "id": "reduce",
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "groupBy",
           "options": {
-            "includeTimeField": false,
-            "labelsToFields": true,
-            "reducers": [
-              "lastNotNull"
-            ]
+            "fields": {
+              "Hostname": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "hostname": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "Value": {
+                "aggregations": [
+                  "max"
+                ],
+                "operation": "aggregate"
+              },
+              "Value 1": {
+                "aggregations": [
+                  "max"
+                ],
+                "operation": "aggregate"
+              },
+              "Value 2": {
+                "aggregations": [
+                  "max"
+                ],
+                "operation": "aggregate"
+              },
+              "Value #A": {
+                "aggregations": [
+                  "max"
+                ],
+                "operation": "aggregate"
+              },
+              "Value #B": {
+                "aggregations": [
+                  "max"
+                ],
+                "operation": "aggregate"
+              },
+              "Value #C": {
+                "aggregations": [
+                  "max"
+                ],
+                "operation": "aggregate"
+              }
+            }
           }
         },
         {
           "id": "organize",
           "options": {
-            "excludeByName": {
-              "Time": true
+            "excludeByName": {},
+            "includeByName": {
+              "Hostname": true,
+              "hostname": true,
+              "Value (max)": true,
+              "Value 1 (max)": true,
+              "Value 2 (max)": true,
+              "Value #A (max)": true,
+              "Value #B (max)": true,
+              "Value #C (max)": true
+            },
+            "indexByName": {
+              "Hostname": 0,
+              "hostname": 0,
+              "Value (max)": 1,
+              "Value 1 (max)": 2,
+              "Value 2 (max)": 3,
+              "Value #A (max)": 1,
+              "Value #B (max)": 2,
+              "Value #C (max)": 3
             },
             "renameByName": {
-              "Value": "Value",
               "hostname": "Hostname",
-              "serial": "Serial"
+              "Value (max)": "CPU",
+              "Value 1 (max)": "Mem",
+              "Value 2 (max)": "Role",
+              "Value #A (max)": "CPU",
+              "Value #B (max)": "Mem",
+              "Value #C (max)": "Role"
             }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "desc": false,
+                "field": "Hostname"
+              }
+            ]
           }
         }
       ],
