@@ -1,10 +1,10 @@
 # Build using the minimum supported Golang version (match go.mod)
-FROM golang:1.24 as builder
+FROM golang:1.26 AS builder
 
 WORKDIR /build
 
 COPY . .
-RUN go get -v -t -d ./...
+RUN go mod download
 RUN make build
 
 FROM scratch
