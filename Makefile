@@ -54,11 +54,9 @@ test-output:
 
 .PHONY: fmt-fix
 fmt-fix:
-	@go mod download golang.org/x/tools
-	@go run golang.org/x/tools/cmd/goimports -w -l .
+	@go run golang.org/x/tools/cmd/goimports@latest -w -l .
 
 .PHONY: fmt-check
 fmt-check:
 	@printf "Check formatting... \n"
-	@go mod download golang.org/x/tools
-	@if [[ $$( go run golang.org/x/tools/cmd/goimports -l . ) ]]; then printf "Files not properly formatted. Run 'make fmt-fix' \n"; exit 1; else printf "Check formatting finished \n"; fi
+	@if [ -n "$$( go run golang.org/x/tools/cmd/goimports@latest -l . )" ]; then printf "Files not properly formatted. Run 'make fmt-fix' \n"; exit 1; else printf "Check formatting finished \n"; fi

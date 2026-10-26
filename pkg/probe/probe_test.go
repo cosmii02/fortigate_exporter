@@ -28,8 +28,9 @@ import (
 )
 
 type preparedResp struct {
-	d []byte
-	q url.Values
+	d   []byte
+	q   url.Values
+	err error
 }
 
 type fakeClient struct {
@@ -52,6 +53,11 @@ func (c *fakeClient) prepare(path string, jfile string) {
 	})
 }
 
+// prepareError makes requests to path fail with err, e.g. an http.APIError for a 404
+func (c *fakeClient) prepareError(path string, err error) {
+	c.data[path] = append(c.data[path], preparedResp{err: err})
+}
+
 func (c *fakeClient) Get(path string, query string, obj interface{}) error {
 	rs, ok := c.data[path]
 	if !ok {
@@ -67,6 +73,9 @@ alt:
 			if len(q[k]) == 0 || q[k][0] != v[0] {
 				continue alt
 			}
+		}
+		if r.err != nil {
+			return r.err
 		}
 		return json.Unmarshal(r.d, obj)
 	}

@@ -35,7 +35,9 @@ Supported metrics right now as follows.
 Global:
 
  * _System/SensorInfo_
+   * `fortigate_sensor_alarm`
    * `fortigate_sensor_fan_rpm`
+   * `fortigate_sensor_power_status`
    * `fortigate_sensor_temperature_celsius`
    * `fortigate_sensor_voltage_volts`
  * _System/Status_
@@ -283,11 +285,12 @@ Where `fortigate-key.yaml` contains pairs of FortiGate targets and API keys in t
 ```
 "https://my-fortigate":
   token: api-key-goes-here
-  # If you have a smaller fortigate unit you might want
-  # to exclude sensors as they do not have any
+  # Smaller units without BGP/OSPF configured answer those
+  # endpoints with errors; exclude them to keep probe_success at 1
   probes:
     exclude:
-      - System/SensorInfo
+      - BGP
+      - OSPF
 
 "https://my-other-fortigate:8443":
   token: api-key-goes-here
@@ -418,7 +421,7 @@ To improve security, limit permissions to required ones only (least privilege pr
 |System/Interface             | netgrp.cfg         |api/v2/monitor/system/interface/select |
 |System/LinkMonitor           | sysgrp.cfg         |api/v2/monitor/system/link-monitor |
 |System/Resource/Usage        | sysgrp.cfg         |api/v2/monitor/system/resource/usage |
-|System/SensorInfo            | sysgrp.cfg         |api/v2/monitor/system/sensor-info |
+|System/SensorInfo            | sysgrp.cfg         |api/v2/monitor/system/sensor-info, falls back to api/v2/monitor/system/monitor-sensor |
 |System/Status                | *any*              |api/v2/monitor/system/status |
 |System/Time/Clock            | sysgrp.cfg         |api/v2/monitor/system/time |
 |System/VDOMResources         | sysgrp.cfg         |api/v2/monitor/system/resource/usage |
